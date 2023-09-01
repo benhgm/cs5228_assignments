@@ -21,6 +21,14 @@ def clean(df_cars_dirty):
     #########################################################################################
     ### Your code starts here ###############################################################
 
+    #################################
+    ### Step 1: Remove Duplicates ###
+    #################################
+    df_cars_cleaned = df_cars_cleaned.drop_duplicates()
+    assert len(df_cars_cleaned) == 14344, "expected 14,344 entries after duplicates are cleared"
+
+    ###################
+    ### Step 2: 
 
     
     
