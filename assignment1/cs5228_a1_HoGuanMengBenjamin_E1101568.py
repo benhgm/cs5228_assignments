@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import euclidean_distances
-
+from IPython.display import display
 
 
 def clean(df_cars_dirty):
@@ -21,15 +21,72 @@ def clean(df_cars_dirty):
     #########################################################################################
     ### Your code starts here ###############################################################
 
-    #################################
-    ### Step 1: Remove Duplicates ###
-    #################################
+    ##############################################
+    ### Step 1: Remove Duplicated Rows of Data ###
+    ##############################################
     df_cars_cleaned = df_cars_cleaned.drop_duplicates()
+    df_cars_cleaned.reset_index(drop=True, inplace=True)
     assert len(df_cars_cleaned) == 14344, "expected 14,344 entries after duplicates are cleared"
+    # display(df_cars_cleaned)
 
-    ###################
-    ### Step 2: 
+    ###########################################################################
+    ### Step 2: Correct Data Errors in Rows with 'mercedes' as Vehicle Make ###
+    ###########################################################################
+    df_cars_mercedes_error = df_cars_cleaned.loc[df_cars_cleaned["make"] == "mercedes"]
 
+    df_cars_a200 = df_cars_mercedes_error.loc[(df_cars_mercedes_error["manufactured"]==2018) & (df_cars_mercedes_error["power"]==120) & (df_cars_mercedes_error["curb_weight"]=="1375")]
+    df_cars_a180 = df_cars_mercedes_error.loc[(df_cars_mercedes_error["manufactured"]==2020) & (df_cars_mercedes_error["power"]== 96) & (df_cars_mercedes_error["curb_weight"]=="1365")]
+    
+    df_cars_a200["model"] = df_cars_a200["model"].apply(lambda x: "a200")
+    df_cars_a180["model"] = df_cars_a180["model"].apply(lambda x: "a180")
+   
+    for idx in df_cars_a200.index:
+        df_cars_cleaned.loc[idx, "make"] = "mercedes-benz"
+        df_cars_cleaned.loc[idx, "model"] = "a200"
+        display(df_cars_cleaned.loc[[idx]])
+    
+    for idx in df_cars_a180.index:
+        df_cars_cleaned.loc[idx, "make"] = "mercedes-benz"
+        df_cars_cleaned.loc[idx, "model"] = "a180"
+        display(df_cars_cleaned.loc[[idx]])
+
+    ##################################################
+    ### Step 3a: Clean up "curb_weight" Dirty Data ###
+    ##################################################
+    df_cars_xxxx = df_cars_cleaned.loc[df_cars_cleaned["curb_weight"] == "XXXXX"]
+
+    for idx, row in df_cars_xxxx.iterrows():
+        correct_entry = df_cars_cleaned.loc[(df_cars_cleaned["manufactured"] == row["manufactured"]) 
+                                            & (df_cars_cleaned["power"] == row["power"])
+                                            & (df_cars_cleaned["engine_cap"] == row["engine_cap"])
+                                            & (df_cars_cleaned["make"] == row["make"])
+                                            & (df_cars_cleaned["model"] == row["model"])
+                                            & (df_cars_cleaned["type_of_vehicle"] == row["type_of_vehicle"])]
+        correct_curb_weight = correct_entry["curb_weight"].unique()
+        correct_curb_weight = correct_curb_weight.tolist()
+        correct_curb_weight.remove("XXXXX")
+
+        if len(correct_curb_weight) > 1:
+            # print(correct_curb_weight)
+            continue
+        elif len(correct_curb_weight) == 0:
+            continue
+        else:
+            df_cars_xxxx.loc[idx, "curb_weight"] = correct_curb_weight[0]
+    
+    for idx in df_cars_xxxx.index:
+        df_cars_cleaned.loc[idx, "curb_weight"] = df_cars_xxxx.loc[idx, "curb_weight"]
+    
+    for col in df_cars_cleaned.columns:
+        print(col, df_cars_cleaned[col].unique())
+
+    df_cars_cleaned = df_cars_cleaned[df_cars_cleaned.curb_weight != "XXXXX"]
+
+    #####################################################
+    ### Step 3b: Convert "curb_weight" data to integer ###
+    #####################################################
+    df_cars_cleaned["curb_weight"] = df_cars_cleaned["curb_weight"].astype(int)
+    display(df_cars_cleaned.dtypes)
     
     
     ### Your code ends here #################################################################
