@@ -66,10 +66,7 @@ def clean(df_cars_dirty):
         correct_curb_weight = correct_curb_weight.tolist()
         correct_curb_weight.remove("XXXXX")
 
-        if len(correct_curb_weight) > 1:
-            # print(correct_curb_weight)
-            continue
-        elif len(correct_curb_weight) == 0:
+        if len(correct_curb_weight) != 1:
             continue
         else:
             df_cars_xxxx.loc[idx, "curb_weight"] = correct_curb_weight[0]
@@ -112,6 +109,44 @@ def handle_nan(df_cars_nan):
 
     #########################################################################################
     ### Your code starts here ###############################################################
+
+    ####################################################
+    ### Step 1: Fill in missing data in "url" column ###
+    ####################################################
+    df_cars_no_nan["url"] = df_cars_no_nan["listing_id"].apply(lambda x: "https://www.sgcarmart.com/listing/" + str(x))
+    # display(df_cars_no_nan.isna().sum())
+    # display(df_cars_no_nan)
+
+    #####################################################
+    ### Step 2: Fill in missing data in "make" column ###
+    #####################################################
+    df_cars_nan_make = df_cars_no_nan.loc[df_cars_no_nan["make"].isna()]
+    # display(df_cars_nan_make)
+    for idx, row in df_cars_nan_make.iterrows():
+        correct_make = df_cars_no_nan.loc[(df_cars_no_nan["model"] == row["model"]) & (df_cars_no_nan["make"].notnull())]
+        correct_make = correct_make["make"].unique()
+        correct_make = correct_make.tolist()[0]
+        
+        df_cars_no_nan.loc[idx, "make"] = correct_make
+    # display(df_cars_no_nan.isna().sum())
+    # display(df_cars_no_nan)
+
+    ########################################################
+    ### Step 3: Fill in missing data in "mileage" column ###
+    ########################################################
+    df_cars_nan_mileage = df_cars_no_nan.loc[df_cars_no_nan["mileage"].isna()]
+    display(df_cars_nan_mileage)
+    df_cars_no_nan["mileage"].fillna(df_cars_no_nan.groupby(['no_of_owners'])['mileage'].transform('median'), inplace=True)
+    display(df_cars_no_nan.loc[df_cars_nan_mileage.index])
+
+    ########################################################
+    ### Step 3: Fill in missing data in "price" column ###
+    ########################################################
+    df_cars_nan_price = df_cars_no_nan.loc[df_cars_no_nan["price"].isna()]
+    display(df_cars_nan_price)
+    df_cars_no_nan["price"].fillna(df_cars_no_nan.groupby(['no_of_owners', 'type_of_vehicle'])['price'].transform('median'), inplace=True)
+    display(df_cars_no_nan.loc[df_cars_nan_price.index])
+    
 
     
     
