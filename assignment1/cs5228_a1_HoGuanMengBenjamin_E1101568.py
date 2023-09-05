@@ -135,17 +135,17 @@ def handle_nan(df_cars_nan):
     ### Step 3: Fill in missing data in "mileage" column ###
     ########################################################
     df_cars_nan_mileage = df_cars_no_nan.loc[df_cars_no_nan["mileage"].isna()]
-    display(df_cars_nan_mileage)
+    # display(df_cars_nan_mileage)
     df_cars_no_nan["mileage"].fillna(df_cars_no_nan.groupby(['no_of_owners'])['mileage'].transform('median'), inplace=True)
-    display(df_cars_no_nan.loc[df_cars_nan_mileage.index])
+    # display(df_cars_no_nan.loc[df_cars_nan_mileage.index])
 
     ########################################################
     ### Step 3: Fill in missing data in "price" column ###
     ########################################################
     df_cars_nan_price = df_cars_no_nan.loc[df_cars_no_nan["price"].isna()]
-    display(df_cars_nan_price)
+    # display(df_cars_nan_price)
     df_cars_no_nan["price"].fillna(df_cars_no_nan.groupby(['no_of_owners', 'type_of_vehicle'])['price'].transform('median'), inplace=True)
-    display(df_cars_no_nan.loc[df_cars_nan_price.index])
+    # display(df_cars_no_nan.loc[df_cars_nan_price.index])
     
 
     
