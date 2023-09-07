@@ -174,13 +174,14 @@ def extract_facts(df_cars_facts):
     ### Your code starts here ###############################################################
 
     # Toy example -- assume question: What is the total number of listings?
-    print('#listings: {}'.format(len(df_cars_facts)))
-    print()
-
+    print(f"1) highest price: {df_cars_facts['price'].max()}\n   lowest price: {df_cars_facts['price'].min()}")
+    print(f"2) number of different car makes: {df_cars_facts['make'].nunique()}")
+    print(f"3) number of sold toyota corollas manufactured before 2010: {len(df_cars_facts.loc[(df_cars_facts['model']=='corolla') & (df_cars_facts['manufactured'] < 2010)])}")
     
+    makes = [[x, len(df_cars_facts.loc[df_cars_facts['make']==x])] for x in df_cars_facts['make'].unique()]
+    sorted_makes = sorted(makes, key=lambda x: x[1], reverse=True)
+    print(f"4) top-3 most sold cars and their corresponding sales:\n\ti. {sorted_makes[0][0]} - {sorted_makes[0][1]}\n\tii. {sorted_makes[1][0]} - {sorted_makes[1][1]}\n\tiii. {sorted_makes[2][0]} - {sorted_makes[2][1]}")
     
-    
-
     ### Your code ends here #################################################################
     #########################################################################################
 
