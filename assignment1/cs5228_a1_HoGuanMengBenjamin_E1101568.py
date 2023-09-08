@@ -182,6 +182,22 @@ def extract_facts(df_cars_facts):
     sorted_makes = sorted(makes, key=lambda x: x[1], reverse=True)
     print(f"4) top-3 most sold cars and their corresponding sales:\n\ti. {sorted_makes[0][0]} - {sorted_makes[0][1]}\n\tii. {sorted_makes[1][0]} - {sorted_makes[1][1]}\n\tiii. {sorted_makes[2][0]} - {sorted_makes[2][1]}")
     
+    suvs = df_cars_facts.loc[df_cars_facts['type_of_vehicle']=='suv']
+    models = [[m, len(suvs.loc[suvs['model']==m])] for m in suvs['model'].unique()]
+    sorted_models = sorted(models, key=lambda x:x[1], reverse=True)
+    print(f"5) most sold SUV car model: {sorted_models[0][0]} - {sorted_models[0][1]} pieces sold")
+
+    low_power = df_cars_facts.loc[df_cars_facts['power'] <= 60]
+    car_makes = [[make, low_power.loc[low_power['make']==make]['price'].sum()] for make in low_power['make'].unique()]
+    sorted_car_makes = sorted(car_makes, key=lambda x:x[1], reverse=True)
+    print(f"6) car make with the highest overall sale among low-powered cars: {sorted_car_makes[0][0]} - ${sorted_car_makes[0][1]}")
+
+    midsize = df_cars_facts.loc[df_cars_facts['type_of_vehicle'] == 'mid-sized sedan']
+    midsize['power-to-engine-cap'] = df_cars_facts['power'].div(df_cars_facts['engine_cap']).round(2)
+    highest_power_to_engine_cap = midsize.loc[midsize['power-to-engine-cap'].idxmax()]
+    print(f"7) midsize sedan with the highest power-to-engine_cap ratio:\n\tmake: {highest_power_to_engine_cap['make']}\n\tmodel: {highest_power_to_engine_cap['model']}\n\tyear of manufacturing: {highest_power_to_engine_cap['manufactured']}\n\tpower-to-engine_cap ratio: {highest_power_to_engine_cap['power-to-engine-cap']}kW/cc")
+    
+    print(f"8) pearson correlation between:\n\tresale price and mileage: {df_cars_facts['price'].corr(df_cars_facts['mileage']).round(2)}\n\tresale price and engine cap: {df_cars_facts['price'].corr(df_cars_facts['engine_cap']).round(2)}")
     ### Your code ends here #################################################################
     #########################################################################################
 
@@ -211,7 +227,7 @@ def kmeans_init(X, k, c1=None, method='kmeans++'):
         c1 = np.random.randint(0, X.shape[0])
         
     # Add selected centroid index to list
-    centroid_indices.append(c1)        
+    centroid_indices.append(c1)  
     
         
     # Calculate and add c2, c3, ..., ck 
@@ -223,8 +239,15 @@ def kmeans_init(X, k, c1=None, method='kmeans++'):
         ### Your code starts here ###############################################################
         
         ## Remember to cover the 2 cases 'kmeans++' and 'maxdist'
+        distances = []
+        for idx in centroid_indices:
+            centroid = X[centroid_indices[idx]].reshape(1, -1)
+            distances.append(euclidean_distances(X, centroid))
+        
+        
         
 
+        
         
         
         ### Your code ends here #################################################################
