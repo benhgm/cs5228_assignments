@@ -27,10 +27,14 @@ def clean(df_cars_dirty):
     df_cars_cleaned = df_cars_cleaned.drop_duplicates()
     df_cars_cleaned.reset_index(drop=True, inplace=True)
     assert len(df_cars_cleaned) == 14344, "expected 14,344 entries after duplicates are cleared"
-    # display(df_cars_cleaned)
+
+    ##################################################
+    ### Step 2: Correct Errors in Manufacture Year ###
+    ##################################################
+    df_cars_cleaned = df_cars_cleaned.loc[df_cars_cleaned['manufactured'] <= 2023]
 
     ###########################################################################
-    ### Step 2: Correct Data Errors in Rows with 'mercedes' as Vehicle Make ###
+    ### Step 3: Correct Data Errors in Rows with 'mercedes' as Vehicle Make ###
     ###########################################################################
     df_cars_mercedes_error = df_cars_cleaned.loc[df_cars_cleaned["make"] == "mercedes"]
 
@@ -43,15 +47,13 @@ def clean(df_cars_dirty):
     for idx in df_cars_a200.index:
         df_cars_cleaned.loc[idx, "make"] = "mercedes-benz"
         df_cars_cleaned.loc[idx, "model"] = "a200"
-        display(df_cars_cleaned.loc[[idx]])
     
     for idx in df_cars_a180.index:
         df_cars_cleaned.loc[idx, "make"] = "mercedes-benz"
         df_cars_cleaned.loc[idx, "model"] = "a180"
-        display(df_cars_cleaned.loc[[idx]])
 
     ##################################################
-    ### Step 3a: Clean up "curb_weight" Dirty Data ###
+    ### Step 4a: Clean up "curb_weight" Dirty Data ###
     ##################################################
     df_cars_xxxx = df_cars_cleaned.loc[df_cars_cleaned["curb_weight"] == "XXXXX"]
 
@@ -73,17 +75,13 @@ def clean(df_cars_dirty):
     
     for idx in df_cars_xxxx.index:
         df_cars_cleaned.loc[idx, "curb_weight"] = df_cars_xxxx.loc[idx, "curb_weight"]
-    
-    for col in df_cars_cleaned.columns:
-        print(col, df_cars_cleaned[col].unique())
 
     df_cars_cleaned = df_cars_cleaned[df_cars_cleaned.curb_weight != "XXXXX"]
 
     #####################################################
-    ### Step 3b: Convert "curb_weight" data to integer ###
+    ### Step 4b: Convert "curb_weight" data to integer ###
     #####################################################
     df_cars_cleaned["curb_weight"] = df_cars_cleaned["curb_weight"].astype(int)
-    display(df_cars_cleaned.dtypes)
     
     
     ### Your code ends here #################################################################
@@ -239,16 +237,24 @@ def kmeans_init(X, k, c1=None, method='kmeans++'):
         ### Your code starts here ###############################################################
         
         ## Remember to cover the 2 cases 'kmeans++' and 'maxdist'
+        
         distances = []
         for idx in centroid_indices:
-            centroid = X[centroid_indices[idx]].reshape(1, -1)
+            centroid = X[idx].reshape(1, -1)
             distances.append(euclidean_distances(X, centroid))
         
+        min_distances = []
+        for i in range(X.shape[0]):
+            min_distances.append(min([k[i] for k in distances]))
         
-        
+        min_distances = np.array(min_distances)
 
-        
-        
+        if method == 'maxdist':
+            c = np.argmax(min_distances)
+        if method == 'kmeans++':
+            probs = np.square(min_distances) / np.sum(np.square(min_distances))
+            probs = probs.reshape(-1)
+            c = np.random.choice(15, size=1, p=probs)[0]
         
         ### Your code ends here #################################################################
         #########################################################################################                
