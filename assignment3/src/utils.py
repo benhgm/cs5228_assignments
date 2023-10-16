@@ -22,6 +22,7 @@ def plot_validation_results(param_to_scores):
     
     plt.xlabel('param')
     plt.ylabel('Cross-Validation RSME Score')
+    plt.savefig('gradient_boost_val.jpg')
     plt.show()
 
     
@@ -44,4 +45,5 @@ def plot_scores(param_to_scores):
     
     plt.xlabel('param')
     plt.ylabel('Cross-Validation RSME Score')
+    plt.savefig('gradient_boost_scores.jpg')
     plt.show()         
